@@ -1,23 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Flywheel.Application.Common.Interfaces;
-using Flywheel.Infrastructure.Persistence;
+using System.Reflection;
+using MediatR;
 
 namespace Flywheel.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        // PostgreSQL Bağlantısı
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        // Register MediatR
+        services.AddMediatR(Assembly.GetExecutingAssembly());
 
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString,
-                builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
-
-        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        // Register other dependencies here
 
         return services;
     }
