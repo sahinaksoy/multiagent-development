@@ -1,24 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Flywheel.Application.Products.Commands.CreateProduct;
+using Flywheel.Application.Products.Queries.GetProducts;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Flywheel.Application.Common.Interfaces;
-using Flywheel.Infrastructure.Persistence;
 
-namespace Flywheel.Infrastructure;
-
-public static class DependencyInjection
+namespace Flywheel.Infrastructure
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static class DependencyInjection
     {
-        // PostgreSQL Bağlantısı
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+        {
+            // MediatR Handlers
+            services.AddMediatR(typeof(CreateProductCommandHandler).Assembly);
+            services.AddMediatR(typeof(GetProductsQueryHandler).Assembly);
 
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString,
-                builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+            // Other dependencies can be added here
 
-        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
-
-        return services;
+            return services;
+        }
     }
 }
